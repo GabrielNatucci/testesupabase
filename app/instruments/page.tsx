@@ -3,9 +3,19 @@ import { Suspense } from "react";
 
 async function InstrumentsData() {
     const supabase = await createClient();
-    const { data: instruments } = await supabase.from("instruments").select();
 
-    return <pre>{JSON.stringify(instruments, null, 2)}</pre>;
+    const { data, error } = await supabase
+        .from("instruments")
+        .select();
+
+    console.log("DATA:", data);
+    console.log("ERROR:", error);
+
+    if (error) {
+        return <pre>Erro: {error.message}</pre>;
+    }
+
+    return <pre>{JSON.stringify(data, null, 2)}</pre>;
 }
 
 export default function Instruments() {
