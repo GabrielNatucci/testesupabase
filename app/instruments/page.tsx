@@ -20,7 +20,7 @@ async function InstrumentsData() {
 
 export default function Instruments() {
     return (
-        <Suspense fallback={<div>Loading instruments...</div>}>
+        <Suspense fallback={<div>Carregando instrumentos...</div>}>
             <InstrumentsData />
         </Suspense>
     );

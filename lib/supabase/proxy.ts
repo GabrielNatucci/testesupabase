@@ -7,14 +7,13 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
-  // If the env vars are not set, skip proxy check. You can remove this
-  // once you setup the project.
+  // Se as variáveis de ambiente não estiverem configuradas, ignore a verificação de proxy. Você pode remover isso depois de configurar o projeto.
   if (!hasEnvVars) {
     return supabaseResponse;
   }
 
-  // With Fluid compute, don't put this client in a global environment
-  // variable. Always create a new one on each request.
+  // Com Fluid compute, não coloque este cliente em uma variável de ambiente
+  // global. Sempre crie um novo a cada requisição.
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
@@ -38,12 +37,12 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  // Do not run code between createServerClient and
-  // supabase.auth.getClaims(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
+  // Não execute código entre createServerClient e
+  // supabase.auth.getClaims(). Um erro simples pode tornar muito difícil depurar
+  // problemas com usuários sendo desconectados aleatoriamente.
 
-  // IMPORTANT: If you remove getClaims() and you use server-side rendering
-  // with the Supabase client, your users may be randomly logged out.
+  // IMPORTANTE: Se você remover getClaims() e usar renderização no lado do servidor
+  // com o cliente Supabase, seus usuários poderão ser desconectados aleatoriamente.
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
@@ -53,24 +52,24 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith("/login") &&
     !request.nextUrl.pathname.startsWith("/auth")
   ) {
-    // no user, potentially respond by redirecting the user to the login page
+    // sem usuário, potencialmente responda redirecionando o usuário para a página de login
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
     return NextResponse.redirect(url);
   }
 
-  // IMPORTANT: You *must* return the supabaseResponse object as it is.
-  // If you're creating a new response object with NextResponse.next() make sure to:
-  // 1. Pass the request in it, like so:
+  // IMPORTANTE: Você *deve* retornar o objeto supabaseResponse como está.
+  // Se você estiver criando um novo objeto de resposta com NextResponse.next() certifique-se de:
+  // 1. Passar o request nele, assim:
   //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
+  // 2. Copiar os cookies, assim:
   //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object to fit your needs, but avoid changing
-  //    the cookies!
-  // 4. Finally:
+  // 3. Alterar o objeto myNewResponse para atender às suas necessidades, mas evite alterar
+  //    os cookies!
+  // 4. Finalmente:
   //    return myNewResponse
-  // If this is not done, you may be causing the browser and server to go out
-  // of sync and terminate the user's session prematurely!
+  // Se isso não for feito, você pode estar fazendo com que o navegador e o servidor fiquem
+  // fora de sincronia e encerre a sessão do usuário prematuramente!
 
   return supabaseResponse;
 }

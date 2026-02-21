@@ -3,9 +3,9 @@ import { TutorialStep } from "./tutorial-step";
 export function ConnectSupabaseSteps() {
     return (
         <ol className="flex flex-col gap-6">
-            <TutorialStep title="Create Supabase project">
+            <TutorialStep title="Criar projeto Supabase">
                 <p>
-                    Head over to{" "}
+                    Vá para{" "}
                     <a
                         href="https://app.supabase.com/project/_/settings/api"
                         target="_blank"
@@ -14,47 +14,47 @@ export function ConnectSupabaseSteps() {
                     >
                         database.new
                     </a>{" "}
-                    and create a new Supabase project.
+                    e crie um novo projeto Supabase.
                 </p>
             </TutorialStep>
 
-            <TutorialStep title="Declare environment variables">
+            <TutorialStep title="Declarar variáveis de ambiente">
                 <p>
-                    Rename the{" "}
+                    Renomeie o{" "}
                     <span className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs font-medium text-secondary-foreground border">
                         .env.example
                     </span>{" "}
-                    file in your Next.js app to{" "}
+                    arquivo em seu aplicativo Next.js para{" "}
                     <span className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs font-medium text-secondary-foreground border">
                         .env.local
                     </span>{" "}
-                    and populate with values from{" "}
+                    e preencha com os valores de{" "}
                     <a
                         href="https://app.supabase.com/project/_/settings/api"
                         target="_blank"
                         className="font-bold hover:underline text-foreground/80"
                         rel="noreferrer"
                     >
-                        your Supabase project&apos;s API Settings
+                        Configurações de API do seu projeto Supabase
                     </a>
                     .
                 </p>
             </TutorialStep>
 
-            <TutorialStep title="Restart your Next.js development server">
+            <TutorialStep title="Reinicie seu servidor de desenvolvimento Next.js">
                 <p>
-                    You may need to quit your Next.js development server and run{" "}
+                    Você pode precisar sair do seu servidor de desenvolvimento Next.js e executar{" "}
                     <span className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs font-medium text-secondary-foreground border">
                         npm run dev
                     </span>{" "}
-                    again to load the new environment variables.
+                    novamente para carregar as novas variáveis de ambiente.
                 </p>
             </TutorialStep>
 
-            <TutorialStep title="Refresh the page">
+            <TutorialStep title="Atualizar a página">
                 <p>
-                    You may need to refresh the page for Next.js to load the new
-                    environment variables.
+                    Você pode precisar atualizar a página para que o Next.js
+                    carregue as novas variáveis de ambiente.
                 </p>
             </TutorialStep>
         </ol>

@@ -52,101 +52,94 @@ export default function Page() {
 export function FetchDataSteps() {
     return (
         <ol className="flex flex-col gap-6">
-            <TutorialStep title="Create some tables and insert some data">
+            <TutorialStep title="Criar tabelas e inserir dados">
                 <p>
-                    Head over to the{" "}
+                    Acesse o{" "}
                     <a
                         href="https://supabase.com/dashboard/project/_/editor"
                         className="font-bold hover:underline text-foreground/80"
                         target="_blank"
                         rel="noreferrer"
                     >
-                        Table Editor
+                        Editor de Tabela
                     </a>{" "}
-                    for your Supabase project to create a table and insert some example
-                    data. If you&apos;re stuck for creativity, you can copy and paste the
-                    following into the{" "}
+                    para seu projeto Supabase para criar uma tabela e inserir alguns dados de exemplo. Se você estiver sem criatividade, pode copiar e colar o seguinte no{" "}
                     <a
                         href="https://supabase.com/dashboard/project/_/sql/new"
                         className="font-bold hover:underline text-foreground/80"
                         target="_blank"
                         rel="noreferrer"
                     >
-                        SQL Editor
+                        Editor SQL
                     </a>{" "}
-                    and click RUN!
+                    e clicar em EXECUTAR!
                 </p>
                 <CodeBlock code={create} />
             </TutorialStep>
 
-            <TutorialStep title="Enable Row Level Security (RLS)">
+            <TutorialStep title="Habilitar Segurança em Nível de Linha (RLS)">
                 <p>
-                    Supabase enables Row Level Security (RLS) by default. To query data
-                    from your <code>notes</code> table, you need to add a policy. You can
-                    do this in the{" "}
+                    Supabase habilita a Segurança em Nível de Linha (RLS) por padrão. Para consultar dados da sua tabela <code>notes</code>, você precisa adicionar uma política. Você pode fazer isso no{" "}
                     <a
                         href="https://supabase.com/dashboard/project/_/editor"
                         className="font-bold hover:underline text-foreground/80"
                         target="_blank"
                         rel="noreferrer"
                     >
-                        Table Editor
+                        Editor de Tabela
                     </a>{" "}
-                    or via the{" "}
+                    ou via{" "}
                     <a
                         href="https://supabase.com/dashboard/project/_/sql/new"
                         className="font-bold hover:underline text-foreground/80"
                         target="_blank"
                         rel="noreferrer"
                     >
-                        SQL Editor
+                        Editor SQL
                     </a>
                     .
                 </p>
                 <p>
-                    For example, you can run the following SQL to allow public read
-                    access:
+                    Por exemplo, você pode executar o seguinte SQL para permitir acesso de leitura público:
                 </p>
                 <CodeBlock code={rls} />
                 <p>
-                    You can learn more about RLS in the{" "}
+                    Você pode aprender mais sobre RLS na{" "}
                     <a
                         href="https://supabase.com/docs/guides/auth/row-level-security"
                         className="font-bold hover:underline text-foreground/80"
                         target="_blank"
                         rel="noreferrer"
                     >
-                        Supabase docs
+                        documentação do Supabase
                     </a>
                     .
                 </p>
             </TutorialStep>
 
-            <TutorialStep title="Query Supabase data from Next.js">
+            <TutorialStep title="Consultar dados do Supabase no Next.js">
                 <p>
-                    To create a Supabase client and query data from an Async Server
-                    Component, create a new page.tsx file at{" "}
+                    Para criar um cliente Supabase e consultar dados de um Componente de Servidor Assíncrono, crie um novo arquivo page.tsx em{" "}
                     <span className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs font-medium text-secondary-foreground border">
                         /app/notes/page.tsx
                     </span>{" "}
-                    and add the following.
+                    e adicione o seguinte.
                 </p>
                 <CodeBlock code={server} />
-                <p>Alternatively, you can use a Client Component.</p>
+                <p>Alternativamente, você pode usar um Componente Cliente.</p>
                 <CodeBlock code={client} />
             </TutorialStep>
 
-            <TutorialStep title="Explore the Supabase UI Library">
+            <TutorialStep title="Explore a Biblioteca de UI do Supabase">
                 <p>
-                    Head over to the{" "}
+                    Acesse a{" "}
                     <a
                         href="https://supabase.com/ui"
                         className="font-bold hover:underline text-foreground/80"
                     >
-                        Supabase UI library
+                        biblioteca de UI do Supabase
                     </a>{" "}
-                    and try installing some blocks. For example, you can install a
-                    Realtime Chat block by running:
+                    e tente instalar alguns blocos. Por exemplo, você pode instalar um bloco de Chat em Tempo Real executando:
                 </p>
                 <CodeBlock
                     code={
@@ -155,8 +148,8 @@ export function FetchDataSteps() {
                 />
             </TutorialStep>
 
-            <TutorialStep title="Build in a weekend and scale to millions!">
-                <p>You&apos;re ready to launch your product to the world! 🚀</p>
+            <TutorialStep title="Construa em um fim de semana e escale para milhões!">
+                <p>Você está pronto para lançar seu produto para o mundo! 🚀</p>
             </TutorialStep>
         </ol>
     );
