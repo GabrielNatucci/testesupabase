@@ -8,7 +8,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar"; // Import Calendar component
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Import Select components
-import { format, isSameDay, parseISO } from "date-fns"; // Import date utilities
+import { format,} from "date-fns"; // Import date utilities
 import { ptBR } from 'date-fns/locale'; // Import locale for pt-BR
 
 // Define Goal type
@@ -33,16 +33,17 @@ export function GoalsManagement() {
         setSelectedDate(new Date());
     }, []);
 
-    const [goals, setGoals] = useState<Goal[]>(() => {
-        // Initial dummy data for demonstration, ensure `new Date()` is client-side
-        if (typeof window === 'undefined') {
-            return []; // Return empty array during SSR
-        }
+    const [goals, setGoals] = useState<Goal[]>([]); // Initialize with empty array
+
+    useEffect(() => {
+        setSelectedDate(new Date());
+
+        // Populate goals with dummy data after component mounts (client-side)
         const today = new Date();
         const tomorrow = new Date();
         tomorrow.setDate(today.getDate() + 1);
 
-        return [
+        const dummyGoals: Goal[] = [
             {
                 id: 1,
                 name: "Ir à academia",
@@ -75,7 +76,8 @@ export function GoalsManagement() {
                 ]
             }
         ];
-    });
+        setGoals(dummyGoals);
+    }, []);
 
     const addGoal = () => {
         if (goalName && goalDescription) {
@@ -212,6 +214,8 @@ export function GoalsManagement() {
                                 toYear={2030}
                                 locale={ptBR} // Set locale to Portuguese
                                 weekStartsOn={0} // Start week on Sunday
+                                defaultMonth={selectedDate || new Date(2024, 0, 1)} // Explicitly set defaultMonth
+                                today={selectedDate || new Date(2024, 0, 1)} // Explicitly set today
                             />
                         </div>
                     </CardContent>
