@@ -1,8 +1,6 @@
 "use client"
 
 import * as React from "react"
-
-
 import {
     ChevronDownIcon,
     ChevronLeftIcon,
@@ -14,7 +12,6 @@ import {
     type DayButton,
     type DayProps,
     type DayPickerProps, // Import DayPickerProps
-    type DayContentProps,
     type SelectSingleEventHandler, // Import the specific handler type
 } from "react-day-picker"
 import { startOfDay, format } from "date-fns"
@@ -197,9 +194,9 @@ function Calendar(props: CalendarProps) {
                         <ChevronDownIcon className={cn("size-4", className)} {...props} />
                     )
                 },
-                DayContent: (dayContentProps) => (
-                    <CustomDayContent
-                        {...dayContentProps}
+                Day: (dayProps) => (
+                    <CustomDay
+                        {...dayProps}
                         goalsByDate={goalsByDate}
                     />
                 ),
@@ -220,16 +217,17 @@ function Calendar(props: CalendarProps) {
     )
 }
 
-interface CustomDayContentProps extends DayContentProps {
+interface CustomDayProps extends DayProps {
     goalsByDate?: Record<string, Goal[]>;
 }
 
-function CustomDayContent(props: CustomDayContentProps) {
-    const { goalsByDate, date } = props;
+function CustomDay(props: CustomDayProps) {
+    const { goalsByDate, day, modifiers } = props;
+    const date = day.date;
     const dayString = format(date, 'yyyy-MM-dd');
     const dayGoals = goalsByDate?.[dayString] || [];
     const hasGoals = dayGoals.length > 0;
-    const isToday = format(new Date(), 'yyyy-MM-dd') === dayString;
+    const isToday = modifiers.today;
 
     return (
         <div className="relative flex flex-col items-center justify-center h-full w-full">
@@ -247,7 +245,6 @@ function CustomDayContent(props: CustomDayContentProps) {
         </div>
     );
 }
-
 // Removed CalendarDayButton as it's no longer needed
 // The DayPicker's default Day button will be used, and CustomDayContent will be its content.
 export { Calendar } // Export only Calendar

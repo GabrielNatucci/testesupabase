@@ -8,7 +8,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar"; // Import Calendar component
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Import Select components
-import { format, addDays, startOfMonth, endOfMonth, isSameDay } from "date-fns"; // Import date utilities
+import { format, addDays, startOfMonth, endOfMonth, isSameDay, parseISO } from "date-fns"; // Import date utilities
 import { ptBR } from 'date-fns/locale'; // Import locale for pt-BR
 import { createClient } from "@/lib/supabase/client"; // Import Supabase client
 import {
