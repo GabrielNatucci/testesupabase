@@ -336,7 +336,7 @@ export function ExpensesManagement() {
                                         <CartesianGrid strokeDasharray="3 3" />
                                         <XAxis dataKey="month" />
                                         <YAxis />
-                                        <Tooltip formatter={(value: number) => `R$ ${value.toFixed(2)}`} />
+                                        <Tooltip formatter={(value: number | undefined) => value !== undefined ? `R$ ${value.toFixed(2)}` : 'N/A'} />
                                         <Legend />
                                         <Line type="monotone" dataKey="total" stroke="#8884d8" activeDot={{ r: 8 }} name="Total de Gastos" />
                                     </LineChart>

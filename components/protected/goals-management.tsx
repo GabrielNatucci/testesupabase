@@ -51,6 +51,7 @@ export function GoalsManagement() {
         const [selectedDaysOfWeek, setSelectedDaysOfWeek] = useState<number[]>([]);
         const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
         const [goals, setGoals] = useState<Goal[]>([]);
+        const [displayMonth, setDisplayMonth] = useState<Date>(new Date());
         const [loading, setLoading] = useState(true);
         const [error, setError] = useState<string | null>(null);
         const [formError, setFormError] = useState<string | null>(null); // New state for form-specific errors
@@ -99,7 +100,9 @@ export function GoalsManagement() {
 
     // Use useEffect to set selectedDate after component mounts
         useEffect(() => {
-            setSelectedDate(new Date());
+            const today = new Date();
+            setSelectedDate(today);
+            setDisplayMonth(today); // Initialize displayMonth with today
         }, []);    
     // Fetch goals from Supabase
     useEffect(() => {
@@ -210,7 +213,7 @@ export function GoalsManagement() {
                 }
                 setLoading(false);
             };
-        const toggleDailyGoalCompletion = (goalId: number, date: Date) => {
+        const toggleDailyGoalCompletion = (goalId: string, date: Date) => {
             setGoals(goals.map(goal => {
                 if (goal.id === goalId) {
                     const dateString = format(date, 'yyyy-MM-dd');
@@ -244,38 +247,44 @@ export function GoalsManagement() {
         // Create a map of goals by date for the calendar view
         const goalsByDateMap = useMemo(() => {
             const map: Record<string, Goal[]> = {};
-            const today = new Date(); // Using today for the start/end of month for simplicity
-            const firstDayOfMonth = startOfMonth(today);
-            const lastDayOfMonth = endOfMonth(today);
-    
+            const firstDayOfMonth = startOfMonth(displayMonth); // Use displayMonth
+            const lastDayOfMonth = endOfMonth(displayMonth); // Use displayMonth
+
+            // Pre-fill the map with empty arrays for all days in the display month
             getDatesBetween(firstDayOfMonth, lastDayOfMonth).forEach(date => {
-                const dateString = format(date, 'yyyy-MM-dd');
-                map[dateString] = []; // Initialize empty array for each day
+                map[format(date, 'yyyy-MM-dd')] = [];
             });
-    
+
             goals.forEach(goal => {
+                // Iterate over the days of the current month being displayed
                 getDatesBetween(firstDayOfMonth, lastDayOfMonth).forEach(date => {
                     const dateString = format(date, 'yyyy-MM-dd');
                     const dayOfWeek = date.getDay(); // 0 for Sunday, 6 for Saturday
-    
+
                     let shouldAddGoal = false;
                     if (goal.recurrence === 'daily') {
                         shouldAddGoal = true;
                     } else if (goal.recurrence === 'weekly' && goal.days_of_week?.includes(dayOfWeek)) {
                         shouldAddGoal = true;
-                    } else if (goal.recurrence === 'once' && goal.progress.some(p => isSameDay(new Date(p.date), date))) {
-                        // For 'once' goals, check if there's progress on this specific date
-                        shouldAddGoal = true;
+                    } else if (goal.recurrence === 'once') {
+                        // For 'once' goals, check if the goal's created_at date is the same as the current date
+                        const goalCreatedAtDate = parseISO(goal.created_at);
+                        if (isSameDay(goalCreatedAtDate, date)) {
+                            shouldAddGoal = true;
+                        }
                     }
-                    // TODO: Add logic for monthly goals
-    
-                    if (shouldAddGoal && map[dateString]) {
+                    // TODO: Add logic for monthly goals (e.g., if goal.created_at.getDate() === date.getDate())
+
+                    if (shouldAddGoal) {
+                        if (!map[dateString]) {
+                            map[dateString] = [];
+                        }
                         map[dateString].push(goal);
                     }
                 });
             });
             return map;
-        }, [goals]);
+        }, [goals, displayMonth]); // Add displayMonth to dependencies
     
         const filteredGoals = useMemo(() => {
             if (!selectedDate) return [];
@@ -392,7 +401,7 @@ export function GoalsManagement() {
                         </DialogContent>
                     </Dialog>
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6">
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-primary">Progresso Diário</CardTitle>
@@ -404,15 +413,15 @@ export function GoalsManagement() {
                                 mode="single"
                                 selected={selectedDate}
                                 onSelect={setSelectedDate}
+                                month={displayMonth} // Pass displayMonth to Calendar
+                                onMonthChange={setDisplayMonth} // Update displayMonth when month changes in Calendar
                                 className="rounded-md border shadow"
-                                captionLayout="dropdown" // Add dropdown for month/year selection
+                                captionLayout="dropdown"
                                 fromYear={2020}
                                 toYear={2030}
-                                locale={ptBR} // Set locale to Portuguese
-                                weekStartsOn={0} // Start week on Sunday
-                                defaultMonth={selectedDate || new Date(2024, 0, 1)} // Explicitly set defaultMonth
-                                today={selectedDate || new Date(2024, 0, 1)} // Explicitly set today
-                                goalsByDate={goalsByDateMap} // Pass the new map to the Calendar
+                                locale={ptBR}
+                                weekStartsOn={0}
+                                goalsByDate={goalsByDateMap}
                             />
                         </div>
                     </CardContent>

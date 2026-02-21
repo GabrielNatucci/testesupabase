@@ -1,6 +1,8 @@
 "use client"
 
 import * as React from "react"
+
+
 import {
     ChevronDownIcon,
     ChevronLeftIcon,
@@ -10,7 +12,10 @@ import {
     DayPicker,
     getDefaultClassNames,
     type DayButton,
+    type DayProps,
+    type DayPickerProps, // Import DayPickerProps
     type DayContentProps,
+    type SelectSingleEventHandler, // Import the specific handler type
 } from "react-day-picker"
 import { startOfDay, format } from "date-fns"
 
@@ -30,22 +35,33 @@ interface Goal {
     progress: { date: string, value?: number, completed: boolean }[];
 }
 
-interface CalendarProps extends React.ComponentProps<typeof DayPicker> {
+// Base props for the Calendar component, including custom ones
+type CalendarBaseProps = {
     buttonVariant?: React.ComponentProps<typeof Button>["variant"];
-    goalsByDate?: Record<string, Goal[]>; // New prop for goals by date
-}
+    goalsByDate?: Record<string, Goal[]>;
+    className?: string; // Add className as it's often passed to the wrapper
+};
 
-function Calendar({
-    className,
-    classNames,
-    showOutsideDays = true,
-    captionLayout = "label",
-    buttonVariant = "ghost",
-    formatters,
-    components,
-    goalsByDate, // Destructure new prop
-    ...props
-}: CalendarProps) {
+// Define CalendarProps using conditional types for `onSelect`
+type CalendarProps = CalendarBaseProps & (
+    | ({ mode: 'single'; selected?: Date; onSelect?: SelectSingleEventHandler } & DayPickerProps)
+    | ({ mode: 'multiple' | 'range' | undefined } & DayPickerProps)
+    | (DayPickerProps & { mode?: undefined }) // Handles default mode and no mode specified
+);
+
+
+function Calendar(props: CalendarProps) {
+    const {
+        className,
+        classNames,
+        showOutsideDays = true,
+        captionLayout = "label",
+        buttonVariant = "ghost",
+        formatters,
+        components,
+        goalsByDate,
+        ...rest
+    } = props
     const defaultClassNames = getDefaultClassNames()
 
     return (
@@ -85,7 +101,7 @@ function Calendar({
                     defaultClassNames.button_next
                 ),
                 month_caption: cn(
-                "flex items-center justify-center [height:var(--cell-size)] w-full [padding-left:var(--cell-size)] [padding-right:var(--cell-size)]",
+                    "flex items-center justify-center [height:var(--cell-size)] w-full [padding-left:var(--cell-size)] [padding-right:var(--cell-size)]",
                     defaultClassNames.month_caption
                 ),
                 dropdowns: cn(
@@ -181,14 +197,10 @@ function Calendar({
                         <ChevronDownIcon className={cn("size-4", className)} {...props} />
                     )
                 },
-                // Removed Day override
-                DayContent: (dayContentProps) => ( // Use DayContent here
+                DayContent: (dayContentProps) => (
                     <CustomDayContent
                         {...dayContentProps}
                         goalsByDate={goalsByDate}
-                        date={dayContentProps.date} // Pass date explicitly
-                        isToday={dayContentProps.modifiers.today} // Pass isToday explicitly
-                        isEmpty={dayContentProps.modifiers.outside} // Pass isEmpty explicitly
                     />
                 ),
                 WeekNumber: ({ children, ...props }) => {
@@ -203,7 +215,7 @@ function Calendar({
                 ...components,
             }}
             disabled={{ before: startOfDay(new Date()) }} // Desabilita datas passadas, mas permite a seleção do dia atual
-            {...props}
+            {...rest}
         />
     )
 }
@@ -212,28 +224,25 @@ interface CustomDayContentProps extends DayContentProps {
     goalsByDate?: Record<string, Goal[]>;
 }
 
-function CustomDayContent({
-    date,
-    isToday,
-    goalsByDate,
-    children, // Accept children prop from DayContentProps
-}: CustomDayContentProps) {
+function CustomDayContent(props: CustomDayContentProps) {
+    const { goalsByDate, date } = props;
     const dayString = format(date, 'yyyy-MM-dd');
     const dayGoals = goalsByDate?.[dayString] || [];
     const hasGoals = dayGoals.length > 0;
+    const isToday = format(new Date(), 'yyyy-MM-dd') === dayString;
 
     return (
         <div className="relative flex flex-col items-center justify-center h-full w-full">
-            <span className="text-sm">{children}</span> {/* Render children here */}
+            <span className="text-sm">{format(date, 'd')}</span>
             {hasGoals && (
-                <div className="absolute bottom-0.5 right-0.5 flex gap-1">
+                <div className="absolute -bottom-1 left-0 right-0 flex justify-center gap-1">
                     {dayGoals.map(goal => (
                         <div key={goal.id} className="size-1.5 rounded-full bg-primary" title={goal.name}></div>
                     ))}
                 </div>
             )}
             {isToday && (
-                <div className="absolute top-0.5 right-0.5 size-1.5 rounded-full bg-red-500"></div> // A small red dot for today
+                <div className="absolute bottom-0.5 left-0.5 size-1.5 rounded-full bg-red-500"></div> // A small red dot for today
             )}
         </div>
     );
