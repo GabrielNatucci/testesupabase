@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { LogoutButton } from "./logout-button";
 
-export function AuthButton({ user }: { user: { email: string } | undefined }) {
+export function AuthButton({ user }: { user?: { email: string } | undefined }) {
     return user ? (
         <div className="flex items-center gap-4">
             Olá, {user.email}!
