@@ -9,8 +9,8 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
     metadataBase: new URL(defaultUrl),
-    title: "Kit de Início Rápido Next.js e Supabase",
-    description: "A forma mais rápida de construir aplicações com Next.js e Supabase",
+    title: "FinanSync - Gerenciador de Finanças e Metas",
+    description: "FinanSync: Gerencie suas finanças e alcance suas metas de vida com nossa plataforma intuitiva e poderosa.",
 };
 
 const geistSans = Geist({
