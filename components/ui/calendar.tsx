@@ -10,10 +10,30 @@ import {
     DayPicker,
     getDefaultClassNames,
     type DayButton,
+    type DayContentProps,
 } from "react-day-picker"
+import { startOfDay, format } from "date-fns"
 
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
+
+// Define Goal type (copied from goals-management.tsx, ideally would be in a shared types file)
+interface Goal {
+    id: string; // Changed to string for UUID from Supabase
+    user_id: string; // Added user_id
+    created_at: string; // Added created_at
+    name: string;
+    description: string;
+    recurrence: 'daily' | 'weekly' | 'monthly' | 'once';
+    days_of_week?: number[]; // Column name changed to match DB convention
+    target_value?: number; // Column name changed to match DB convention
+    progress: { date: string, value?: number, completed: boolean }[];
+}
+
+interface CalendarProps extends React.ComponentProps<typeof DayPicker> {
+    buttonVariant?: React.ComponentProps<typeof Button>["variant"];
+    goalsByDate?: Record<string, Goal[]>; // New prop for goals by date
+}
 
 function Calendar({
     className,
@@ -23,10 +43,9 @@ function Calendar({
     buttonVariant = "ghost",
     formatters,
     components,
+    goalsByDate, // Destructure new prop
     ...props
-}: React.ComponentProps<typeof DayPicker> & {
-    buttonVariant?: React.ComponentProps<typeof Button>["variant"]
-}) {
+}: CalendarProps) {
     const defaultClassNames = getDefaultClassNames()
 
     return (
@@ -45,7 +64,7 @@ function Calendar({
                 ...formatters,
             }}
             classNames={{
-                root: cn("w-fit", defaultClassNames.root),
+                root: cn("w-full", defaultClassNames.root),
                 months: cn(
                     "flex gap-4 flex-col md:flex-row relative",
                     defaultClassNames.months
@@ -117,7 +136,7 @@ function Calendar({
                 range_middle: cn("rounded-none", defaultClassNames.range_middle),
                 range_end: cn("rounded-r-md bg-accent", defaultClassNames.range_end),
                 today: cn(
-                    "bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none",
+                    "bg-primary text-primary-foreground rounded-md data-[selected=true]:rounded-none",
                     defaultClassNames.today
                 ),
                 outside: cn(
@@ -162,7 +181,16 @@ function Calendar({
                         <ChevronDownIcon className={cn("size-4", className)} {...props} />
                     )
                 },
-                DayButton: CalendarDayButton,
+                // Removed Day override
+                DayContent: (dayContentProps) => ( // Use DayContent here
+                    <CustomDayContent
+                        {...dayContentProps}
+                        goalsByDate={goalsByDate}
+                        date={dayContentProps.date} // Pass date explicitly
+                        isToday={dayContentProps.modifiers.today} // Pass isToday explicitly
+                        isEmpty={dayContentProps.modifiers.outside} // Pass isEmpty explicitly
+                    />
+                ),
                 WeekNumber: ({ children, ...props }) => {
                     return (
                         <td {...props}>
@@ -174,47 +202,43 @@ function Calendar({
                 },
                 ...components,
             }}
+            disabled={{ before: startOfDay(new Date()) }} // Desabilita datas passadas, mas permite a seleção do dia atual
             {...props}
         />
     )
 }
 
-function CalendarDayButton({
-    className,
-    day,
-    modifiers,
-    ...props
-}: React.ComponentProps<typeof DayButton>) {
-    const defaultClassNames = getDefaultClassNames()
+interface CustomDayContentProps extends DayContentProps {
+    goalsByDate?: Record<string, Goal[]>;
+}
 
-    const ref = React.useRef<HTMLButtonElement>(null)
-    React.useEffect(() => {
-        if (modifiers.focused) ref.current?.focus()
-    }, [modifiers.focused])
+function CustomDayContent({
+    date,
+    isToday,
+    goalsByDate,
+    children, // Accept children prop from DayContentProps
+}: CustomDayContentProps) {
+    const dayString = format(date, 'yyyy-MM-dd');
+    const dayGoals = goalsByDate?.[dayString] || [];
+    const hasGoals = dayGoals.length > 0;
 
     return (
-        <Button
-            ref={ref}
-            variant="ghost"
-            size="icon"
-            data-day={day.date.toLocaleDateString()}
-            data-selected-single={
-                modifiers.selected &&
-                !modifiers.range_start &&
-                !modifiers.range_end &&
-                !modifiers.range_middle
-            }
-            data-range-start={modifiers.range_start}
-            data-range-end={modifiers.range_end}
-            data-range-middle={modifiers.range_middle}
-            className={cn(
-                "data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md [&>span]:text-xs [&>span]:opacity-70",
-                defaultClassNames.day,
-                className
+        <div className="relative flex flex-col items-center justify-center h-full w-full">
+            <span className="text-sm">{children}</span> {/* Render children here */}
+            {hasGoals && (
+                <div className="absolute bottom-0.5 right-0.5 flex gap-1">
+                    {dayGoals.map(goal => (
+                        <div key={goal.id} className="size-1.5 rounded-full bg-primary" title={goal.name}></div>
+                    ))}
+                </div>
             )}
-            {...props}
-        />
-    )
+            {isToday && (
+                <div className="absolute top-0.5 right-0.5 size-1.5 rounded-full bg-red-500"></div> // A small red dot for today
+            )}
+        </div>
+    );
 }
 
-export { Calendar, CalendarDayButton }
+// Removed CalendarDayButton as it's no longer needed
+// The DayPicker's default Day button will be used, and CustomDayContent will be its content.
+export { Calendar } // Export only Calendar
