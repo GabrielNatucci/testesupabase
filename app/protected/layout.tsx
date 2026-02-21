@@ -3,9 +3,11 @@
 import { AuthSlot } from "@/app/protected/auth-slot"; // Direct import of AuthSlot
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import Link from "next/link";
-import { Suspense } from "react";
 import { SidebarNav } from "@/components/protected/sidebar-nav";
 import { LayoutDashboard, Wallet, PiggyBank, Target, MessageSquare } from "lucide-react";
+import { useRouter } from "next/navigation"; // Import useRouter
+import { useEffect, useState } from "react"; // Import useState and useEffect
+import { createClient } from "@/lib/supabase/client"; // Import client-side supabase client
 
 const sidebarNavItems = [
     {
@@ -40,6 +42,35 @@ export default function ProtectedLayout({
 }: {
     children: React.ReactNode;
 }) {
+    const router = useRouter();
+    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState<any>(null); // State to hold user info
+
+    useEffect(() => {
+        const checkUser = async () => {
+            const supabase = createClient();
+            const { data: { session }, error } = await supabase.auth.getSession();
+
+            if (error || !session) {
+                router.push("/auth/login");
+            } else {
+                setUser(session.user);
+            }
+            setLoading(false);
+        };
+
+        checkUser();
+    }, [router]);
+
+    if (loading) {
+        return <div className="min-h-screen flex items-center justify-center">Carregando...</div>;
+    }
+
+    // Only render children if user is authenticated
+    if (!user) {
+        return null; // Or some message/spinner, but redirection should handle it
+    }
+
     return (
         <main className="min-h-screen flex flex-col">
             <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
@@ -48,9 +79,7 @@ export default function ProtectedLayout({
                         <Link href={"/protected"}>FinanSync</Link>
                     </div>
                     <div className="flex items-center gap-4">
-                        <Suspense>
-                            <AuthSlot /> {/* Render AuthSlot directly */}
-                        </Suspense>
+                        <AuthSlot /> {/* AuthSlot will render the AuthButton based on session */}
                         <ThemeSwitcher />
                     </div>
                 </div>

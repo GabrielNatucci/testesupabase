@@ -18,7 +18,7 @@ export function AuthSlot() {
         };
 
         fetchUser();
-    }, []);
+    }, []); // Removed router from dependency array
 
     if (loading) {
         return <div>Carregando...</div>; // Or a spinner
@@ -29,3 +29,4 @@ export function AuthSlot() {
 
     return <AuthButton user={authButtonUser} />;
 }
+

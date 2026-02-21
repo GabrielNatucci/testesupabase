@@ -102,6 +102,14 @@ export function LoginForm({
                                 Inscrever-se
                             </Link>
                         </div>
+                        <div className="mt-2 text-center text-sm">
+                            <Link
+                                href="/"
+                                className="underline underline-offset-4"
+                            >
+                                Voltar para a página inicial
+                            </Link>
+                        </div>
                     </form>
                 </CardContent>
             </Card>
